@@ -29,7 +29,7 @@ class Person
              int FindName(const string &str);  //找到该成员  是返回1,否则返回0 
              string& GetTel() {return tel_num;}; //得到电话号码 
              string& GetName() {return name;};//得到名字 
-			 string& GetAdd() {return address;};//得到地址
+	     string& GetAdd() {return address;};//得到地址
 }; 
 
 //构造函数 
@@ -37,7 +37,7 @@ Person::Person(const string &n, const string &t, const string &m)
 {
       name = n;
       tel_num = t; 
-	  address = m;
+      address = m;
       next_ptr = NULL;           
 }
 
@@ -46,7 +46,7 @@ Person::Person(Person &p)
 {
       name = p.name;             
       tel_num = p.tel_num;  
-	  address = p.address;
+      address = p.address;
       next_ptr = p.next_ptr;
 }
 
@@ -221,7 +221,7 @@ void operate::Save()
                ofile << '\n' << i << '.'
                      << p -> GetName() << '\n' 
                      << "tel:" << setw(15) << p -> GetTel()<<'\n'
-					 <<"Address"<< setw(15) << p -> GetAdd();
+		     <<"Address"<< setw(15) << p -> GetAdd();
                p = p -> next_ptr;  
                i++;    
             }
@@ -258,10 +258,10 @@ void operate::Load()
             ifile.get();//点 
             string name;
             string tel;
-			string add;
+	    string add;
             getline(ifile,name);//名字 
             ifile >> tel >> tel;//电话 
-			ifile >> add >> add;//地址 
+	    ifile >> add >> add;//地址 
             Person per(name,tel,add); 
             Create (per);                     
          }
@@ -320,7 +320,7 @@ int main()
                    cout << "请输入联系人姓名:" << endl;
                    cin.get(); 
                    getline (cin,name);
-				   cout << "请输入联系人电话:" << endl;
+		   cout << "请输入联系人电话:" << endl;
                    cin.get(); 
                    getline (cin,tel);
                    cout << "请输入联系人地址:" << endl;
@@ -333,8 +333,7 @@ int main()
             case 2://删除联系人 
                    {
                    string deletename;
-                   cout << "请输入要删除的联系人姓名:" 
-                        << endl; 
+                   cout << "请输入要删除的联系人姓名:" << endl; 
                    cin.get(); 
                    getline (cin,deletename);
                    mypb.Delete(deletename); 
@@ -344,8 +343,7 @@ int main()
             case 3://查询某个联系人
                    {
                    string fname;
-                   cout << "请输入要查询的联系人姓名:"             
-                        << endl;   
+                   cout << "请输入要查询的联系人姓名:"<< endl;   
                    cin.get(); 
                    getline (cin,fname);
                    mypb.Find(fname);
@@ -363,7 +361,7 @@ int main()
                    } 
             default:
                     {
-                    cerr << "输入错误,请重新输入!" << endl; 
+                    cout << "输入错误,请重新输入!" << endl; 
                     break;                             
                     }                      
          }       
