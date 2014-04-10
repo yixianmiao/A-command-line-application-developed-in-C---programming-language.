@@ -1,0 +1,376 @@
+// project.cpp : 定义控制台应用程序的入口点。
+//
+
+#include "stdafx.h"
+
+
+int _tmain(int argc, _TCHAR* argv[])
+{
+	return 0;
+}
+#include<iostream>
+#include<stdlib.h>
+#include<fstream>
+#include<iomanip>
+#include<string>
+using namespace std; 
+
+//成员 
+class Person
+{
+      private:
+              string name;//姓名 
+              string tel_num;//电话 
+			  string address;//地址
+      public:
+             Person *next_ptr;//指向下一个成员的链结 
+             Person(const string &n=0, const string &t=0,const string &m=0);//构造 
+             Person(Person &p); //拷贝构造函数 
+             int FindName(const string &str);  //找到该成员  是返回1,否则返回0 
+             string& GetTel() {return tel_num;}; //得到电话号码 
+             string& GetName() {return name;};//得到名字 
+			 string& GetAdd() {return address;};//得到地址
+}; 
+
+//构造函数 
+Person::Person(const string &n, const string &t, const string &m) 
+{
+      name = n;
+      tel_num = t; 
+	  address = m;
+      next_ptr = NULL;           
+}
+
+//拷贝构造函数 
+Person::Person(Person &p)
+{
+      name = p.name;             
+      tel_num = p.tel_num;  
+	  address = p.address;
+      next_ptr = p.next_ptr;
+}
+
+//找到该成员
+int Person::FindName(const string &str)
+{
+      if (str == name)
+      {
+         return 1; 
+      }                      
+      else
+      {
+         return 0; 
+      }                          
+}
+
+//操作类
+class operate
+{
+      private:
+              Person * head_ptr;  
+      public:
+             operate();//构造
+             void Create(Person newperson);//添加记录 
+             void Delete(const string &deletename);//删除记录 
+             void Find(const string &fname);//查找记录 
+             void Save();//保存到文件 
+             void Load();//从文件读取 
+             ~operate();//析构     
+}; 
+//构造函数 
+operate::operate()
+{
+      head_ptr = NULL;
+}
+//创建新记录 
+void operate::Create(Person newperson)
+{
+      if (head_ptr == NULL)//若为空链表直接添加记录 
+      {
+         head_ptr = new Person (newperson);             
+      }
+      else
+      {
+         Person *p = head_ptr;
+         while (p -> next_ptr != NULL)//找到尾节点 为p 
+         {      
+            p = p -> next_ptr;      
+         }
+      
+         p -> next_ptr = new Person (newperson);//添加记录 
+      }   
+      cout << "已添加新纪录" << endl;  
+}
+
+//删除记录 
+void operate::Delete(const string &deletename) 
+{
+      if (head_ptr == NULL)//头为空 
+      {
+         cout << "还没有任何记录!" << endl;  
+         system("pause");             
+      }
+      
+      else if (head_ptr -> next_ptr == NULL) //只有头 
+      {
+         if(head_ptr -> FindName (deletename))
+         {
+            delete head_ptr; 
+            head_ptr = NULL;           
+            cout << "已成功删除" << deletename << endl; 
+         }
+         else
+         {
+            cout << "未找到这条记录!" << endl;       
+            system("pause");  
+         } 
+      } 
+      
+      else   //其他情况 
+      {
+         Person *last = head_ptr;//记录上一个链节 
+         Person *p = last -> next_ptr; 
+         
+         if(last -> FindName (deletename)) //删头 
+         {
+         delete last;         
+         head_ptr = p;
+         cout << "已成功删除" << deletename << endl;      
+         }
+         
+         else//其他情况 
+         {  
+            while (p != NULL && !(p -> FindName (deletename)))//遍历 
+            {
+               last = last -> next_ptr;
+               p = last -> next_ptr;
+            } 
+         
+            if (p != NULL) //找到了 
+            {
+               last -> next_ptr = p -> next_ptr;
+               delete p; 
+               cout << "已成功删除" << deletename << endl;
+            }
+            else //没找到 
+            {
+               cout << "未找到这条记录!" << endl;   
+               system("pause");      
+            } 
+         }
+      }                
+}
+//查找记录 
+void operate::Find (const string &fname)
+{
+      if (head_ptr == NULL)//头为空 
+      {
+         cout << "还没有任何记录!" << endl;  
+         system("pause");    
+      }              
+      
+      else//有记录 
+      {
+         Person *p = head_ptr;
+         while (p != NULL && !(p -> FindName (fname)))//遍历 
+         {
+            p = p -> next_ptr;
+         }                   
+         
+         if (p != NULL) //找到了 
+         {
+            cout << fname << "的电话号码是:" << p -> GetTel() << endl; 
+			cout << fname << "的地址是:" << p -> GetAdd() << endl; 
+            system("pause");  
+         }
+         
+         else //没找到 
+         {
+            cout << "未找到这条记录!" << endl;       
+            system("pause");  
+         } 
+      }    
+}
+//保存到文件 
+void operate::Save()
+{
+      if (head_ptr == NULL)//头为空 
+      {
+         cout << "还没有任何记录!" << endl;  
+         system("pause");    
+      }              
+      
+      else//有记录 
+      {
+         ofstream ofile("recode.txt",ios::out|ios::trunc);//打开文件 
+         if (!ofile)
+         {
+            cerr << "无法打开recode.txt" << endl; 
+            system("pause");                
+         }      
+         
+         else//成功打开 
+         {
+            ofile.seekp(0,ios::beg);//重定位       
+            Person *p = head_ptr;
+            int i=1;
+            ofile << "recode:"; 
+            
+            while (p != NULL)//遍历 
+            {
+               ofile << '\n' << i << '.'
+                     << p -> GetName() << '\n' 
+                     << "tel:" << setw(15) << p -> GetTel()<<'\n'
+					 <<"Address"<< setw(15) << p -> GetAdd();
+               p = p -> next_ptr;  
+               i++;    
+            }
+        
+         ofile.close();//关闭文件 
+         cout << "成功保存到文件,请查看recode.txt" << endl;  
+         }
+      }                   
+}
+
+//从文件中读取 
+void operate::Load()
+{
+      string filename; 
+      cout << "请输入文件名(XXXXX.XXX):" << endl;
+      cin >> filename;
+      
+      ifstream ifile(filename.c_str(), ios::in);//打开文件
+      if (!ifile)
+      {
+         cerr << "无法打开" << filename << endl;  
+         system("pause");           
+      }                       
+      
+      else//成功打开 
+      {
+         ifile.seekg(0,ios::beg);//重定位 
+         int z;
+         string str; 
+         getline(ifile,str);//欢迎信息 
+         while(!ifile.eof())  
+         {
+            ifile >> z;//数字 
+            ifile.get();//点 
+            string name;
+            string tel;
+			string add;
+            getline(ifile,name);//名字 
+            ifile >> tel >> tel;//电话 
+			ifile >> add >> add;//地址 
+            Person per(name,tel,add); 
+            Create (per);                     
+         }
+         
+         Delete(""); 
+         
+         ifile.close();
+         cout << "成功从文件" << filename << "中读取记录!" << endl;                  
+      }                      
+}
+
+
+//析构 
+operate::~operate()
+{
+      Person *temp = head_ptr; 
+      while (head_ptr != NULL) 
+      {
+         head_ptr = head_ptr -> next_ptr; 
+         delete temp;      
+         temp = head_ptr; 
+      }
+      cout << "已删除所有联系人!" << endl;   
+}
+
+//功能选择 
+int Choice (void)
+{
+      int ch;
+      cout << "\t\t\t请选择:\n" 
+           << "\t\t\t1.add新的联系人\n"
+           << "\t\t\t2.remove某个联系人\n"
+           << "\t\t\t3.research某个联系人\n"
+           << "\t\t\t4.将数据导出到文件\n"
+           << "\t\t\t5.从文件导入数据\n"
+           << "\t\t\t0.退出" << endl;  
+      cin >> ch;
+      return ch;
+}
+
+//主函数 
+int main()
+{
+      cout << "\t\t\t欢迎!\n\n" << endl;  
+      operate mypb; 
+      int ch; 
+      while (ch=Choice()) 
+      {
+         switch(ch)      
+         {
+            case 1://新增联系人 
+                   {
+                   string name;
+                   string tel;
+				   string add;
+                   cout << "请输入联系人姓名:" << endl;
+                   cin.get(); 
+                   getline (cin,name);
+				   cout << "请输入联系人电话:" << endl;
+                   cin.get(); 
+                   getline (cin,tel);
+                   cout << "请输入联系人地址:" << endl;
+                   cin >> add;
+                   
+                   Person per(name,tel,add);
+                   mypb.Create(per);
+                   break;
+                   }
+            case 2://删除联系人 
+                   {
+                   string deletename;
+                   cout << "请输入要删除的联系人姓名:" 
+                        << endl; 
+                   cin.get(); 
+                   getline (cin,deletename);
+                   mypb.Delete(deletename); 
+                   break; 
+                   }        
+            
+            case 3://查询某个联系人
+                   {
+                   string fname;
+                   cout << "请输入要查询的联系人姓名:"             
+                        << endl;   
+                   cin.get(); 
+                   getline (cin,fname);
+                   mypb.Find(fname);
+                   break;     
+                   }       
+           case 4://将数据导出到文件 
+                   {
+                   mypb.Save();      
+                   break; 
+                   } 
+            case 5:// 从文件导入数据      
+                   {
+                   mypb.Load();                        
+                   break;                         
+                   } 
+            default:
+                    {
+                    cerr << "输入错误,请重新输入!" << endl; 
+                    break;                             
+                    }                      
+         }       
+      }
+       
+      cout << "感谢您使用,再见!" << endl; 
+        
+      system("pause");
+      return 0;     
+}
